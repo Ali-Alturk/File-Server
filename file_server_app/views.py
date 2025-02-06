@@ -1,20 +1,16 @@
-from rest_framework.views import APIView
-from rest_framework.response import Response
-from .utils import validate_token  # Assuming this function validates the token
+# fileupload/views.py
+from rest_framework import viewsets
+from rest_framework.permissions import IsAuthenticated
+from .models import FileUpload
+from .serializers import FileUploadSerializer
 
-class FileUploadView(APIView):
-    def post(self, request):
-        token = request.headers.get('Authorization', '').replace('Token ', '')
+class FileUploadViewSet(viewsets.ModelViewSet):
+    queryset = FileUpload.objects.all()
+    serializer_class = FileUploadSerializer
+    permission_classes = [IsAuthenticated]
 
-        # Validate the token using your custom validation logic
-        if not validate_token(token):
-            return Response({"error": "Invalid token"}, status=401)
+    def perform_create(self, serializer):
+        serializer.save(uploaded_by=self.request.user)
 
-        # Process the uploaded file
-        file = request.FILES.get('file')
-        if not file:
-            return Response({"error": "No file provided"}, status=400)
-
-        # Save the file or process as needed
-        return Response({"message": "File uploaded successfully"}, status=200)
-
+    def get_queryset(self):
+        return FileUpload.objects.filter(uploaded_by=self.request.user)

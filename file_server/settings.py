@@ -9,7 +9,7 @@ https://docs.djangoproject.com/en/5.1/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.1/ref/settings/
 """
-
+from datetime import timedelta
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -38,6 +38,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
+    'rest_framework_simplejwt',
     'master',
     'file_server_app',
 ]
@@ -78,8 +79,12 @@ WSGI_APPLICATION = 'file_server.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'fileserver_db',  # Database name
+        'USER': 'root',  # MySQL username
+        'PASSWORD': '1234',  # MySQL user password
+        'HOST': '127.0.0.1',  # Hostname (default is localhost)
+        'PORT': '3306',  # MySQL port (default is 3306)
     }
 }
 
@@ -127,3 +132,15 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 MASTER_URL = "http://localhost:8000"
 
+#AUTH_USER_MODEL = 'master.User'
+
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    ),
+}
+
+SIMPLE_JWT = {
+    'ACCESS_TOKEN_LIFETIME': timedelta(days=10),
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
+}
